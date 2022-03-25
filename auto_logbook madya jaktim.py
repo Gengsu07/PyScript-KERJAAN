@@ -1,5 +1,4 @@
 from playwright.sync_api import Playwright, sync_playwright
-import telegram_bot
 from bs4 import BeautifulSoup
 from datetime import datetime
 

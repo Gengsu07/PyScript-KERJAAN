@@ -5,6 +5,7 @@ import numpy as np
 from pandasql import sqldf
 
 mpninfo_conn = create_engine('mysql://sugengw07:sgwi2341@10.4.19.215/mpninfo')
+psql_conn = create_engine('postgresql://postgres:sgwi2341@10.4.19.215/penerimaan')
 pysqldf = lambda q: sqldf(q,globals())
 
 def mpn_union():
@@ -187,10 +188,12 @@ def ppmpkm_jenis(ppmpkm_add):
 
 data = mpn_union()
 data_ppmpkm = ppmpkm(data)
-print(data_ppmpkm.columns)
 ppmpkm_add = ppmpkm_next(data_ppmpkm)
-print(ppmpkm_add.columns)
 ok = ppmpkm_jenis(ppmpkm_add)
-print(ok.columns)
+
+# Tambah KODE MAP
+kdmap = pd.read_sql('select * from map_polos',con=psql_conn)
+ok = pd.merge(ok,kdmap,left_on='kdmap',right_on='KD MAP',how='left')
+ok.drop('KD MAP',axis=1,inplace=True)
 #ppmpkm_add.to_excel(r'D:\DATA KANTOR\SQL\ppmpkm_add.xlsx',index=False)
 ok.to_excel(r'D:\DATA KANTOR\SQL\ppmpkm.xlsx',index=False)
