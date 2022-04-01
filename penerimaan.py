@@ -195,9 +195,14 @@ ok = ppmpkm_jenis(ppmpkm_add)
 kdmap = pd.read_sql('select * from map_polos',con=psql_conn)
 ok = pd.merge(ok,kdmap,left_on='kdmap',right_on='KD MAP',how='left')
 ok.drop('KD MAP',axis=1,inplace=True)
+ok['datebayar'] = pd.to_datetime(ok['datebayar'])
+ok['FULL'] = ok['npwp']+ok['kpp']+ok['cabang']
 
+#tambah KLU,SEKSI,AR
+klu = pd.read_sql('select "FULL","NAMA_AR","SEKSI","NAMA_KLU","JENIS_WP" from mfwp',con=psql_conn)
+ok = pd.merge(ok,klu, on=['FULL'],how='left')
 #SAVING FILE
 #ppmpkm_add.to_excel(r'D:\DATA KANTOR\SQL\ppmpkm_add.xlsx',index=False)
-ok.to_excel(r'D:\DATA KANTOR\SQL\cekppmpkm.xlsx',index=False)
-# ok.to_sql('ppmpkm2022',con=psql_conn)
+#ok.to_excel(r'D:\DATA KANTOR\SQL\cekppmpkm.xlsx',index=False)
+ok.to_sql('ppmpkm2022',con=psql_conn,if_exists='replace',index=False)
 # ok.to_parquet(r'D:\DATA KANTOR\PENERIMAAN\0.2022\ppmpkm.parquet',index=False)

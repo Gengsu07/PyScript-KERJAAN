@@ -29,6 +29,7 @@ def run(playwright: Playwright) -> None:
     page.click("text=Masuk")
     # assert page.url == "https://logbook.pajak.go.id/Presensi"
     # Click text=<< Isi Assessment
+    #page.on('dialog', dialog => dialog.dismiss());
     page.click("text=<< Isi Assessment")
     # assert page.url == "https://logbook.pajak.go.id/SelfAssessmentKesehatan/form"
     # Click [aria-label=""]
