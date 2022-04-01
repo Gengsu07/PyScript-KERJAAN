@@ -147,6 +147,7 @@ def ppmpkm(data):
     select
     npwp,kpp,cabang,nama,kdmap,kdbayar,masa,tahun,tanggalbayar,bulanbayar,datebayar,nominal,ntpn,
     nosk,nospm,ket,tahunsk,cast(strftime('%Y',datebayar) as INTEGER)as tahunbayar, case
+    when kdmap = '411128' and kdbayar in('427','428') then 'PPS'
     when kdmap = '411128' and kdbayar ='422' then 'PKM'
     when ket in ('SPMKP','PBK KIRIM','PBK TERIMA') THEN 'PPM'
     when tahunbayar-tahun in(0,1) and kdmap in ('411125','411126','411111','411112') and 
