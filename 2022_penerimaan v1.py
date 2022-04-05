@@ -166,8 +166,8 @@ def ppmpkm_jenis(data_ppmpkm):
     select npwp,kpp,cabang,nama,kdmap,kdbayar,masa,tahun,tanggalbayar,bulanbayar,datebayar,nominal,ntpn,
     nosk,nospm,ket,tahunsk,tahunbayar,"FLAG_PPM_PKM", case
     when "FLAG_PPM_PKM"='PPM' then 'RUTIN'
-    when "FLAG_PPM_PKM" ='PKM' and tahunsk not in(0,22) then 'SKP / STP sd 2021'
-    when "FLAG_PPM_PKM" ='PKM' and tahunsk in(22) then 'SKP / STP sd 2022'
+    when "FLAG_PPM_PKM" ='PKM' and tahunsk not in(0,22) then 'Penagihan'
+    when "FLAG_PPM_PKM" ='PKM' and tahunsk in(22) then 'Pemeriksaan'
     else 'PENGAWASAN'
     end JENIS_PPM_PKM
     from
@@ -193,6 +193,6 @@ klu = pd.read_sql('select "FULL","NAMA_AR","SEKSI","NAMA_KLU","JENIS_WP" from mf
 ok = pd.merge(ok,klu, on=['FULL'],how='left')
 #SAVING FILE
 #ppmpkm_add.to_excel(r'D:\DATA KANTOR\SQL\ppmpkm_add.xlsx',index=False)
-#ok.to_excel(r'D:\DATA KANTOR\SQL\cekppmpkm.xlsx',index=False)
+#ok.to_excel(r'D:\DATA KANTOR\SQL\ppmpkm2022.xlsx',index=False)
 ok.to_sql('ppmpkm2022',con=psql_conn,if_exists='replace',index=False)
 # ok.to_parquet(r'D:\DATA KANTOR\PENERIMAAN\0.2022\ppmpkm.parquet',index=False)
