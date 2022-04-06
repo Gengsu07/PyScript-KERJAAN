@@ -193,6 +193,5 @@ klu = pd.read_sql('select "FULL","NAMA_AR","SEKSI","NAMA_KLU","JENIS_WP" from mf
 ok = pd.merge(ok,klu, on=['FULL'],how='left')
 #SAVING FILE
 #ppmpkm_add.to_excel(r'D:\DATA KANTOR\SQL\ppmpkm_add.xlsx',index=False)
-#ok.to_excel(r'D:\DATA KANTOR\SQL\ppmpkm2022.xlsx',index=False)
+ok.to_excel(r'D:\DATA KANTOR\LAPORAN\ppmpkm2022.xlsx',index=False)
 ok.to_sql('ppmpkm2022',con=psql_conn,if_exists='replace',index=False)
-# ok.to_parquet(r'D:\DATA KANTOR\PENERIMAAN\0.2022\ppmpkm.parquet',index=False)
