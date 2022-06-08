@@ -1,6 +1,7 @@
+from re import L
 from numpy import index_exp, isin, mod
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, sql
 import numpy as np
 from pandasql import sqldf
 
@@ -134,6 +135,11 @@ def mpn_union():
     data['tahunsk'].fillna(0, inplace=True)
     data['tahunsk'].replace(['','ne','ui','-'],0,inplace=True)
     data['tahunsk'] = data['tahunsk'].astype('int')
+    #data.to_sql('mpn2022_union',if_exists='replace',index=False, con=psql_conn)
+    # import sqlite3
+    # sqconn = sqlite3.connect('data.db')
+    # data.to_sql('data',con=sqconn,index=False)
+    print('union ok')
     return data
 
 def ppmpkm(data):
@@ -159,6 +165,7 @@ def ppmpkm(data):
     '''
     data_ppmpkm = pysqldf(queri)
     #data_ppmpkm['tahunbayar'] = data_ppmpkm['tahunbayar'].astype('int')
+    print('ppmpkm_ok')
     return data_ppmpkm
 
 def ppmpkm_jenis(data_ppmpkm):
@@ -176,22 +183,28 @@ def ppmpkm_jenis(data_ppmpkm):
     data = pysqldf(queri)
     return data
 
+def main():
+    data = mpn_union()
+    print(data.head())
+    data_ppmpkm = ppmpkm(data)
+    ok = ppmpkm_jenis(data_ppmpkm)
 
-data = mpn_union()
-data_ppmpkm = ppmpkm(data)
-ok = ppmpkm_jenis(data_ppmpkm)
+    # Tambah KODE MAP
+    kdmap = pd.read_sql('select * from map_polos',con=psql_conn)
+    ok = pd.merge(ok,kdmap,left_on='kdmap',right_on='KD MAP',how='left')
+    ok.drop('KD MAP',axis=1,inplace=True)
+    #ok['datebayar'] = pd.to_datetime(ok['datebayar'])
+    ok['FULL'] = ok['npwp']+ok['kpp']+ok['cabang']
 
-# Tambah KODE MAP
-kdmap = pd.read_sql('select * from map_polos',con=psql_conn)
-ok = pd.merge(ok,kdmap,left_on='kdmap',right_on='KD MAP',how='left')
-ok.drop('KD MAP',axis=1,inplace=True)
-#ok['datebayar'] = pd.to_datetime(ok['datebayar'])
-ok['FULL'] = ok['npwp']+ok['kpp']+ok['cabang']
-
-#tambah KLU,SEKSI,AR
-klu = pd.read_sql('select "FULL","NAMA_AR","SEKSI","NAMA_KLU","JENIS_WP" from mfwp',con=psql_conn)
-ok = pd.merge(ok,klu, on=['FULL'],how='left')
-#SAVING FILE
-#ppmpkm_add.to_excel(r'D:\DATA KANTOR\SQL\ppmpkm_add.xlsx',index=False)
-ok.to_excel(r'D:\DATA KANTOR\LAPORAN\ppmpkm2022.xlsx',index=False)
-ok.to_sql('ppmpkm2022',con=psql_conn,if_exists='replace',index=False)
+    #tambah KLU,SEKSI,AR
+    klu = pd.read_sql('select "FULL","NAMA_WP","NAMA_AR","SEKSI","NAMA_KLU","JENIS_WP" from mfwp',con=psql_conn)
+    ok = pd.merge(ok,klu, on=['FULL'],how='left')
+    #SAVING FILE
+    #ppmpkm_add.to_excel(r'D:\DATA KANTOR\SQL\ppmpkm_add.xlsx',index=False)
+    #ok.to_excel(r'D:\DATA KANTOR\BULANAN\ppmpkm2022.xlsx',index=False)
+    ok.to_sql('ppmpkm2022',con=psql_conn,if_exists='replace',index=False)
+    ok.to_excel(r'D:\DATA KANTOR\BULANAN\ppmpkm2022.xlsx',index=False)
+    #ok.to_parquet(r'D:\DATA KANTOR\BULANAN\ppmpkm2022.parquet',index=False)
+    
+if __name__ == '__main__':
+    main()

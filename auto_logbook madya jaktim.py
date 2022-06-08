@@ -1,6 +1,7 @@
 from playwright.sync_api import Playwright, sync_playwright
 from bs4 import BeautifulSoup
 from datetime import datetime
+import pyautogui as pag
 
 
 def run(playwright: Playwright) -> None:
@@ -24,7 +25,7 @@ def run(playwright: Playwright) -> None:
     # Click [placeholder="Kata\ Sandi"]
     page.click('//input[@id="password"]')
     # Fill [placeholder="Kata\ Sandi"]
-    page.fill('//input[@id="password"]', "Gengsu10")
+    page.fill('//input[@id="password"]', "Gengsu77")
     # Click text=Masuk
     page.click("text=Masuk")
     # assert page.url == "https://logbook.pajak.go.id/Presensi"
@@ -33,6 +34,7 @@ def run(playwright: Playwright) -> None:
     page.click("text=<< Isi Assessment")
     # assert page.url == "https://logbook.pajak.go.id/SelfAssessmentKesehatan/form"
     # Click [aria-label=""]
+    page.click('//button[@class="swal2-close"]')
     page.click('//a[@href="#next"]')
 
     page.click('//*[@id="form_self_assessment"]/div[3]/ul/li[2]/a')
