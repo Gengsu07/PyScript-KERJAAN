@@ -166,8 +166,9 @@ def ppmpkm_jenis(data_ppmpkm):
     select npwp,kpp,cabang,nama,kdmap,kdbayar,masa,tahun,tanggalbayar,bulanbayar,datebayar,nominal,ntpn,
     nosk,nospm,ket,tahunsk,tahunbayar,"FLAG_PPM_PKM", case
     when "FLAG_PPM_PKM"='PPM' then 'RUTIN'
-    when "FLAG_PPM_PKM" ='PKM' and tahunsk not in(0,22) then 'Penagihan'
-    when "FLAG_PPM_PKM" ='PKM' and tahunsk in(22) then 'Pemeriksaan'
+    when "FLAG_PPM_PKM" ='PKM' and tahunsk not in(0,22) then 'PENAGIHAN'
+    when "FLAG_PPM_PKM" ='PKM' and tahunsk in(22) then 'PEMERIKSAAN'
+    when kdbayar like '5%' then 'PEMERIKSAAN'
     else 'PENGAWASAN'
     end JENIS_PPM_PKM
     from
@@ -188,10 +189,8 @@ ok = pd.merge(ok,kdmap,left_on='kdmap',right_on='KD MAP',how='left')
 ok['FULL'] = ok['npwp']+ok['kpp']+ok['cabang']
 
 #tambah KLU,SEKSI,AR
-klu = pd.read_sql('select "FULL","NAMA_AR","SEKSI","NAMA_KLU","KODE_KLU","JENIS_WP" from mfwp',con=psql_conn)
-pindah = pd.read_sql('select * from wppindah',con=psql_conn)
-mf = pd.concat([klu, pindah],ignore_index=True)
-ok = pd.merge(ok,mf, on=['FULL'],how='left')
+klu = pd.read_sql('select "FULL","NAMA_WP","NAMA_AR","SEKSI","NAMA_KLU","KODE_KLU","JENIS_WP" from mfwp_juni2022',con=psql_conn)
+ok = pd.merge(ok,klu, on=['FULL'],how='left')
 ok['datebayar'] = ok['datebayar'].astype('datetime64[ns]')
 
 klu = pd.read_sql('select * from klu',con=psql_conn)
@@ -199,8 +198,10 @@ ok  = pd.merge(ok,klu,left_on='KODE_KLU', right_on='klu_kode', how='left' )
 sektor = pd.read_sql('select * from sektor',con=psql_conn)
 ok = pd.merge(ok, sektor, left_on='klu_sektor', right_on='Kode',how='left')
 
-ok.drop(['KD MAP','klu_kode','Kode'],axis=1,inplace=True)
+ok.drop(['KD MAP','klu_kode','Kode','nama'],axis=1,inplace=True)
+ok['nominal'] = ok['nominal'].astype('int64')
+
 #SAVING FILE
-#ppmpkm_add.to_excel(r'D:\DATA KANTOR\SQL\ppmpkm_add.xlsx',index=False)
-#ok.to_excel(r'D:\DATA KANTOR\LAPORAN\ppmpkm2022.xlsx',index=False)
-ok.to_sql('ppmpkm2022',con=psql_conn,if_exists='replace',index=False)
+
+#ok.to_excel(r'D:\DATA KANTOR\BULANAN\Penerimaan 2022_Flag.xlsx',index=False)
+ok.to_sql('ppmpkm2022',con=psql_conn,if_exists='replace')

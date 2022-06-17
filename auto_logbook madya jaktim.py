@@ -6,7 +6,7 @@ import pyautogui as pag
 
 def run(playwright: Playwright) -> None:
     iphone7 = p.devices['iPhone 7']
-    browser = playwright.chromium.launch(headless=False)
+    browser = playwright.chromium.launch(headless=True)
     context = browser.new_context(
         ** iphone7,
         locale='id_ID',
