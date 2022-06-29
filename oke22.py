@@ -1,3 +1,4 @@
+from matplotlib.ft2font import FAST_GLYPHS
 from numpy import index_exp, isin, mod
 import pandas as pd
 from sqlalchemy import create_engine
@@ -205,3 +206,31 @@ ok['nominal'] = ok['nominal'].astype('int64')
 
 #ok.to_excel(r'D:\DATA KANTOR\BULANAN\Penerimaan 2022_Flag.xlsx',index=False)
 ok.to_sql('ppmpkm2022',con=psql_conn,if_exists='replace')
+print('PPMPKM DONE')
+
+mpn_2022 = ok[['FULL','NAMA_WP','MAP','kdbayar','datebayar','nominal','ket','Kategori','NAMA_AR','SEKSI','ntpn']].rename(columns={'nominal':'jumlah'})
+mpn_2022 = mpn_2022.groupby(['FULL','NAMA_WP','MAP','kdbayar','datebayar','ket','Kategori','NAMA_AR','SEKSI','ntpn']).sum().reset_index()
+
+kueri2021 = '''
+select mo."FULL" , mo."NAMA_WP"  ,mo."MAP" ,mo.kdbayar ,mo.tgl_setor as datebayar,sum(mo.jumlah2021) as jumlah ,
+mo."KET" as ket ,mo."Kategori" ,mo."NAMA_AR" ,mo."SEKSI" ,mo.ntpn
+from laporan.mpn2021_oke mo 
+group by mo."FULL"  , mo."NAMA_WP"  ,mo."MAP" ,mo.kdbayar  ,mo.tgl_setor ,mo."KET" ,mo."Kategori" ,mo."NAMA_AR" ,mo."SEKSI",mo.ntpn
+'''
+kueri2020 = '''
+select mo."FULL" , mo."NAMA_WP"  ,mo."MAP" ,mo.kdbayar ,mo.tgl_setor as datebayar,sum(mo.jumlah2020) as jumlah ,
+mo."KET" as ket ,mo."Kategori" ,mo."NAMA_AR" ,mo."SEKSI" ,mo.ntpn
+from laporan.mpn2020_oke mo 
+group by mo."FULL"  , mo."NAMA_WP"  ,mo."MAP" ,mo.kdbayar  ,mo.tgl_setor ,mo."KET" ,mo."Kategori" ,mo."NAMA_AR" ,mo."SEKSI", mo.ntpn
+'''
+
+mpn_2021 = pd.read_sql(kueri2021, con=psql_conn)
+mpn_2020 = pd.read_sql(kueri2020, con=psql_conn)
+
+mpn2020_2022 = pd.concat([mpn_2020,mpn_2021, mpn_2022], ignore_index=True)
+mpn2020_2022['tahun'] = mpn2020_2022['datebayar'].dt.year
+mpn2020_2022['bulan'] = mpn2020_2022['datebayar'].dt.month
+mpn2020_2022['hari'] = mpn2020_2022['datebayar'].dt.day
+mpn2020_2022.to_sql('mpn2020_2022', if_exists='replace', index=False, con=psql_conn, schema='laporan')
+#mpn2020_2022.to_excel(r'D:\DATA KANTOR\BULANAN\Penerimaan 2020_2022.xlsx',index=False)
+print('MPN 2020-2022 DONE')
