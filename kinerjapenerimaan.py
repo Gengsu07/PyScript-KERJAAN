@@ -24,14 +24,17 @@ ac.move_to_element(mpn).perform()
 driver.find_element_by_xpath('//span[@id="kinerja"]').click()
 
 time.sleep(3)
+tahun ='2022'
+awalbulan = 'Januari'
+akhirbulan = 'Juni'
 bulanakhir = Select(driver.find_element_by_xpath('//*[@id="dd_tahun"]'))
-bulanakhir.select_by_visible_text('2021')
+bulanakhir.select_by_visible_text('{}'.format(tahun))
 time.sleep(1)
 bulanakhir = Select(driver.find_element_by_xpath('//*[@id="bulan1"]'))
-bulanakhir.select_by_visible_text('Januari')
+bulanakhir.select_by_visible_text('{}'.format(awalbulan))
 time.sleep(1)
 bulanakhir = Select(driver.find_element_by_xpath('//*[@id="bulan2"]'))
-bulanakhir.select_by_visible_text('Juni')
+bulanakhir.select_by_visible_text('{}'.format(akhirbulan))
 time.sleep(1)
 unit = Select(driver.find_element_by_xpath('//*[@id="kanwil"]'))
 unit.select_by_visible_text('KPP Se-KANWIL')
@@ -54,6 +57,6 @@ for n in baris[15:]:
     data.loc[len(data)] = isian
 data.replace(',','',inplace=True,regex=True)
 data.loc[:,'TARGET':'NETTO LALU'] = data.loc[:,'TARGET':'NETTO LALU'].apply(pd.to_numeric, errors='coerce')
-data.to_excel(r'D:\DATA KANTOR\APPPORTAL\kinerjapenerimaan.xlsx',index=False)
+data.to_excel(r'D:\DATA KANTOR\APPPORTAL\{}_{}_{}_PerJenis_Appportal.xlsx'.format(tahun,awalbulan,akhirbulan),index=False)
 
 driver.quit()

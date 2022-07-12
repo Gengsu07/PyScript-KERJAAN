@@ -1,9 +1,11 @@
+from datetime import datetime
 from matplotlib.ft2font import FAST_GLYPHS
 from numpy import index_exp, isin, mod
 import pandas as pd
 from sqlalchemy import create_engine
 import numpy as np
 from pandasql import sqldf
+from datetime import date
 
 mpninfo_conn = create_engine('mysql://sugengw07:sgwi2341@10.4.19.215/mpninfo')
 psql_conn = create_engine('postgresql://postgres:sgwi2341@10.4.19.215/penerimaan')
@@ -203,8 +205,8 @@ ok.drop(['KD MAP','klu_kode','Kode','nama'],axis=1,inplace=True)
 ok['nominal'] = ok['nominal'].astype('int64')
 
 #SAVING FILE
-
-#ok.to_excel(r'D:\DATA KANTOR\BULANAN\Penerimaan 2022_Flag.xlsx',index=False)
+now = date.today()
+#ok.to_excel(r'D:\DATA KANTOR\BULANAN\DATA\Penerimaan2022_{}.xlsx'.format(now),index=False)
 ok.to_sql('ppmpkm2022',con=psql_conn,if_exists='replace')
 print('PPMPKM DONE')
 
