@@ -142,7 +142,7 @@ def mpn_union():
 def ppmpkm(data):
     queri = '''
     select
-    npwp,kpp,cabang,nama,kdmap,kdbayar,masa,tahun,tanggalbayar,bulanbayar,datebayar,nominal,ntpn,
+    npwp,kpp,cabang,nama,kdmap,kdbayar,masa,masa2,tahun,tanggalbayar,bulanbayar,datebayar,nominal,ntpn,
     nosk,nospm,ket,tahunsk,tahunbayar, case
     when kdmap = '411128' and kdbayar in('427','428') then 'PPS'
     when kdmap = '411128' and kdbayar ='422' then 'PKM'
@@ -166,7 +166,7 @@ def ppmpkm(data):
 
 def ppmpkm_jenis(data_ppmpkm):
     queri = '''
-    select npwp,kpp,cabang,nama,kdmap,kdbayar,masa,tahun,tanggalbayar,bulanbayar,datebayar,nominal,ntpn,
+    select npwp,kpp,cabang,nama,kdmap,kdbayar,masa,masa2,tahun,tanggalbayar,bulanbayar,datebayar,nominal,ntpn,
     nosk,nospm,ket,tahunsk,tahunbayar,"FLAG_PPM_PKM", case
     when "FLAG_PPM_PKM"='PPM' then 'RUTIN'
     when "FLAG_PPM_PKM" ='PKM' and tahunsk not in(0,22) then 'PENAGIHAN'
@@ -206,7 +206,7 @@ ok['nominal'] = ok['nominal'].astype('int64')
 
 #SAVING FILE
 now = date.today()
-#ok.to_excel(r'D:\DATA KANTOR\BULANAN\DATA\Penerimaan2022_{}.xlsx'.format(now),index=False)
+ok.to_excel(r'D:\DATA KANTOR\BULANAN\DATA\Penerimaan2022_{}.xlsx'.format(now),index=False)
 ok.to_sql('ppmpkm2022',con=psql_conn,if_exists='replace')
 print('PPMPKM DONE')
 
